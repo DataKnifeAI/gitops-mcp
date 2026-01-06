@@ -260,6 +260,10 @@ This repository is designed for GitOps workflows. Update the manifests and apply
 
 - **[MCP Servers Review](docs/MCP_SERVERS_REVIEW.md)** - Detailed review of all HTTP MCP servers
 - **[Repository Structure](docs/STRUCTURE.md)** - Guide to the repository organization
+- **[Contributing](CONTRIBUTING.md)** - Guidelines for contributing to this project
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community standards and expectations
+- **[Security Policy](SECURITY.md)** - Security reporting and best practices
+- **[Changelog](CHANGELOG.md)** - History of changes and updates
 
 ## File Organization
 
