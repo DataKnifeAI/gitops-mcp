@@ -1,0 +1,109 @@
+# Cursor Rules for GitOps MCP Project
+
+This project contains Kubernetes deployment manifests for HTTP MCP (Model Context Protocol) servers.
+
+## Project Context
+
+- **Purpose**: Kubernetes deployments for HTTP MCP servers in a dedicated namespace
+- **Namespace**: `mcp-servers`
+- **Structure**: Organized by server with separate files for deployment, service, configmap, and secrets
+- **Tool**: Kustomize for resource management
+
+## Code Style and Standards
+
+### Kubernetes Manifests
+- Use YAML format with proper indentation (2 spaces)
+- Always specify `namespace: mcp-servers` in metadata
+- Include appropriate labels: `app`, `component: mcp-server`, `managed-by: gitops`
+- Use consistent resource naming: `{server-name}-mcp`
+
+### File Organization
+- Each MCP server has its own directory under `mcp-servers/`
+- Separate concerns: `deployment.yaml`, `service.yaml`, `configmap.yaml`, `secret.yaml.example`
+- Never commit actual `secret.yaml` files (use `.example` templates)
+
+### Security Best Practices
+- Always use non-root users (UID 1000)
+- Enable read-only root filesystem
+- Drop all capabilities
+- Disable privilege escalation
+- Use ConfigMaps for non-sensitive data
+- Use Secrets for sensitive data (never commit)
+
+### Resource Management
+- Standard resource requests: 100m CPU, 128Mi memory
+- Standard resource limits: 500m CPU, 512Mi memory
+- Always include health checks (liveness and readiness probes)
+- Use pod anti-affinity for high availability
+
+### MCP Server Configuration
+- All servers use HTTP transport: `MCP_TRANSPORT=http`
+- Default port: 8000
+- Health endpoint: `/health`
+- Log level configurable via ConfigMap
+
+## Common Patterns
+
+### Deployment Structure
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {server-name}-mcp
+  namespace: mcp-servers
+  labels:
+    app: {server-name}-mcp
+    component: mcp-server
+spec:
+  replicas: 2
+  # ... rest of deployment
+```
+
+### Service Structure
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {server-name}-mcp
+  namespace: mcp-servers
+  labels:
+    app: {server-name}-mcp
+    component: mcp-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: {server-name}-mcp
+```
+
+## When Adding New MCP Servers
+
+1. Create directory: `mcp-servers/{server-name}/`
+2. Create files: `deployment.yaml`, `service.yaml`, `configmap.yaml`, `secret.yaml.example`
+3. Add resources to `kustomization.yaml`
+4. Update documentation in `docs/` folder
+5. Follow existing patterns for consistency
+
+## Documentation
+
+- Main documentation: `README.md`
+- Additional docs: `docs/` folder
+- Always update documentation when making structural changes
+
+## Testing
+
+- Validate YAML syntax before committing
+- Test with `kubectl apply --dry-run=client`
+- Verify namespace is correct
+- Check resource limits are appropriate
+
+## GitOps Considerations
+
+- This repo is designed for GitOps workflows (ArgoCD, Flux, etc.)
+- Secrets should be managed externally (Sealed Secrets, External Secrets, Vault)
+- Use Kustomize for resource management
+- Keep manifests declarative and idempotent

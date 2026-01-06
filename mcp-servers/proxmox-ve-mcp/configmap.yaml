@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxmox-ve-mcp-config
+  namespace: mcp-servers
+  labels:
+    app: proxmox-ve-mcp
+    component: mcp-server
+data:
+  LOG_LEVEL: "info"
+  PROXMOX_SKIP_SSL_VERIFY: "false"

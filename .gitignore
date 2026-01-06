@@ -1,0 +1,14 @@
+# Secrets - never commit these!
+secrets.yaml
+*.secret.yaml
+*.secrets.yaml
+
+# Kubernetes temporary files
+*.tmp.yaml
+*.bak.yaml
+
+# Editor files
+*.swp
+*.swo
+*~
+.DS_Store

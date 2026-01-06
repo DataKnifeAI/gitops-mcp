@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mcp-servers
+
+resources:
+  # Namespace
+  - namespace.yaml
+  
+  # Proxmox VE MCP
+  - mcp-servers/proxmox-ve-mcp/deployment.yaml
+  - mcp-servers/proxmox-ve-mcp/service.yaml
+  - mcp-servers/proxmox-ve-mcp/configmap.yaml
+  
+  # UniFi Network MCP
+  - mcp-servers/unifi-network-mcp/deployment.yaml
+  - mcp-servers/unifi-network-mcp/service.yaml
+  - mcp-servers/unifi-network-mcp/configmap.yaml
+  
+  # UniFi Protect MCP
+  - mcp-servers/unifi-protect-mcp/deployment.yaml
+  - mcp-servers/unifi-protect-mcp/service.yaml
+  - mcp-servers/unifi-protect-mcp/configmap.yaml
+  
+  # UniFi Manager MCP
+  - mcp-servers/unifi-manager-mcp/deployment.yaml
+  - mcp-servers/unifi-manager-mcp/service.yaml
+  - mcp-servers/unifi-manager-mcp/configmap.yaml
+  
+  # High Command MCP
+  - mcp-servers/high-command-mcp/deployment.yaml
+  - mcp-servers/high-command-mcp/service.yaml
+  - mcp-servers/high-command-mcp/serviceaccount.yaml
+  - mcp-servers/high-command-mcp/configmap.yaml
+
+# Note: secrets.yaml files should be added separately and not committed to git
+# Uncomment and add secret files when using kustomize:
+# - mcp-servers/proxmox-ve-mcp/secret.yaml
+# - mcp-servers/unifi-network-mcp/secret.yaml
+# - mcp-servers/unifi-protect-mcp/secret.yaml
+# - mcp-servers/unifi-manager-mcp/secret.yaml
+
+commonLabels:
+  managed-by: gitops
+  component: mcp-infrastructure

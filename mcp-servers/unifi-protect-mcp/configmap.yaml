@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unifi-protect-mcp-config
+  namespace: mcp-servers
+  labels:
+    app: unifi-protect-mcp
+    component: mcp-server
+data:
+  LOG_LEVEL: "info"
+  UNIFI_BASE_URL: "https://192.168.1.1"
+  UNIFI_SKIP_SSL_VERIFY: "false"

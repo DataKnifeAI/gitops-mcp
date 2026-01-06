@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxmox-ve-mcp
+  namespace: mcp-servers
+  labels:
+    app: proxmox-ve-mcp
+    version: v1
+    component: mcp-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: proxmox-ve-mcp
+  template:
+    metadata:
+      labels:
+        app: proxmox-ve-mcp
+        component: mcp-server
+    spec:
+      containers:
+      - name: proxmox-ve-mcp
+        image: ghcr.io/surrealwolf/proxmox-ve-mcp:latest
+        imagePullPolicy: IfNotPresent
+        
+        # HTTP Transport Configuration
+        env:
+        - name: MCP_TRANSPORT
+          value: "http"
+        - name: MCP_HTTP_ADDR
+          value: ":8000"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: proxmox-ve-mcp-config
+              key: LOG_LEVEL
+              optional: true
+        - name: PROXMOX_BASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-ve-mcp-secrets
+              key: PROXMOX_BASE_URL
+        - name: PROXMOX_API_USER
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-ve-mcp-secrets
+              key: PROXMOX_API_USER
+        - name: PROXMOX_API_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-ve-mcp-secrets
+              key: PROXMOX_API_TOKEN_ID
+        - name: PROXMOX_API_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-ve-mcp-secrets
+              key: PROXMOX_API_TOKEN_SECRET
+        - name: PROXMOX_SKIP_SSL_VERIFY
+          valueFrom:
+            configMapKeyRef:
+              name: proxmox-ve-mcp-config
+              key: PROXMOX_SKIP_SSL_VERIFY
+              optional: true
+        
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        
+        # Health Checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 2
+        
+        # Resource Management
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        
+        # Security Context
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      
+      # Pod Disruption Budget
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - proxmox-ve-mcp
+              topologyKey: kubernetes.io/hostname
