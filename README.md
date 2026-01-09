@@ -248,7 +248,23 @@ kubectl get events -n mcp-servers --sort-by='.lastTimestamp'
 
 ## GitOps
 
-This repository is designed for GitOps workflows. Update the manifests and apply changes through your GitOps tool (ArgoCD, Flux, etc.).
+This repository is designed for GitOps workflows. Update the manifests and apply changes through your GitOps tool (ArgoCD, Flux, Fleet, etc.).
+
+### Fleet Compatibility
+
+**Note**: The `kustomization.yaml` file has been renamed to `.kustomization.yaml` to prevent Rancher Fleet from auto-detecting it and attempting to use Kustomize post-rendering, which was causing deployment failures.
+
+Fleet will process all Kubernetes YAML manifests directly, which works because:
+- All manifests already have namespaces and labels specified
+- Individual resource files are self-contained and valid
+- Fleet can apply Kubernetes manifests directly without Kustomize
+
+For local Kustomize usage, temporarily rename the file:
+```bash
+mv .kustomization.yaml kustomization.yaml
+kubectl kustomize .
+mv kustomization.yaml .kustomization.yaml
+```
 
 **Important**: Never commit `secret.yaml` files to the repository. Use a secrets management solution like:
 - Sealed Secrets

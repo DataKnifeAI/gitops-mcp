@@ -1,0 +1,17 @@
+# Fleet configuration file
+# 
+# Fleet will process all Kubernetes YAML manifests directly without Kustomize post-rendering.
+# 
+# Note: kustomization.yaml has been renamed to .kustomization.yaml to prevent Fleet
+# from auto-detecting it and trying to use Kustomize post-rendering, which was causing
+# the error: "must build at directory: file is not directory"
+#
+# This works because:
+# - All YAML manifests already have namespaces and labels specified
+# - Fleet can apply Kubernetes manifests directly without Kustomize
+# - Individual resource files are self-contained and valid
+#
+# For local kustomize usage:
+#   mv .kustomization.yaml kustomization.yaml
+#   kubectl kustomize .
+#   mv kustomization.yaml .kustomization.yaml
