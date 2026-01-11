@@ -33,12 +33,6 @@ gitops-mcp/
     │   ├── configmap.yaml
     │   └── secret.yaml.example
     │
-    ├── unifi-manager-mcp/
-    │   ├── deployment.yaml
-    │   ├── service.yaml
-    │   ├── configmap.yaml
-    │   └── secret.yaml.example
-    │
     └── high-command-mcp/
         ├── deployment.yaml
         ├── service.yaml

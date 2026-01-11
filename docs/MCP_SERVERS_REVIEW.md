@@ -34,16 +34,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
   - Requires: `UNIFI_API_KEY`
   - Optional: `UNIFI_BASE_URL` (default: `https://192.168.1.1`), `UNIFI_SKIP_SSL_VERIFY`
 
-### 4. **unifi-manager-mcp**
-- **Location**: `/home/lee/git/unifi-manager-mcp`
-- **Language**: Go
-- **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
-- **Default Port**: 8000
-- **Image**: `harbor.dataknife.net/library/unifi-manager-mcp:latest`
-- **Configuration**:
-  - Requires: `UNIFI_API_KEY`
-
-### 5. **high-command-mcp**
+### 4. **high-command-mcp**
 - **Location**: `/home/lee/git/high-command/high-command-mcp`
 - **Language**: Python
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
@@ -96,7 +87,6 @@ All deployments include:
    - `proxmox-ve-mcp/deployment.yaml`
    - `unifi-network-mcp/deployment.yaml`
    - `unifi-protect-mcp/deployment.yaml`
-   - `unifi-manager-mcp/deployment.yaml`
    - `high-command-mcp/deployment.yaml`
 
 2. **Configuration** (per-server directories):

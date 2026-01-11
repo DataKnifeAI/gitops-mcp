@@ -32,11 +32,6 @@ gitops-mcp/
     │   ├── service.yaml
     │   ├── configmap.yaml
     │   └── secret.yaml.example
-    ├── unifi-manager-mcp/
-    │   ├── deployment.yaml
-    │   ├── service.yaml
-    │   ├── configmap.yaml
-    │   └── secret.yaml.example
     └── high-command-mcp/
         ├── deployment.yaml
         ├── service.yaml
@@ -51,8 +46,7 @@ The following HTTP MCP servers are configured:
 1. **proxmox-ve-mcp** - Proxmox VE management MCP server
 2. **unifi-network-mcp** - UniFi Network management MCP server
 3. **unifi-protect-mcp** - UniFi Protect management MCP server
-4. **unifi-manager-mcp** - UniFi Manager MCP server
-5. **high-command-mcp** - High Command MCP server
+4. **high-command-mcp** - High Command MCP server
 
 For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](docs/MCP_SERVERS_REVIEW.md).
 
@@ -64,7 +58,6 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
    - `harbor.dataknife.net/library/proxmox-ve-mcp:latest`
    - `harbor.dataknife.net/library/unifi-network-mcp:latest`
    - `harbor.dataknife.net/library/unifi-protect-mcp:latest`
-   - `harbor.dataknife.net/library/unifi-manager-mcp:latest`
    - `harbor.dataknife.net/library/high-command-mcp:latest`
 4. Harbor registry credentials with pull access
 
@@ -99,7 +92,6 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
    cp mcp-servers/proxmox-ve-mcp/secret.yaml.example mcp-servers/proxmox-ve-mcp/secret.yaml
    cp mcp-servers/unifi-network-mcp/secret.yaml.example mcp-servers/unifi-network-mcp/secret.yaml
    cp mcp-servers/unifi-protect-mcp/secret.yaml.example mcp-servers/unifi-protect-mcp/secret.yaml
-   cp mcp-servers/unifi-manager-mcp/secret.yaml.example mcp-servers/unifi-manager-mcp/secret.yaml
    
    # Edit each secret.yaml file with your actual credentials
    # DO NOT commit these files to git!
@@ -112,7 +104,6 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
      - mcp-servers/proxmox-ve-mcp/secret.yaml
      - mcp-servers/unifi-network-mcp/secret.yaml
      - mcp-servers/unifi-protect-mcp/secret.yaml
-     - mcp-servers/unifi-manager-mcp/secret.yaml
    ```
 
 4. **Deploy everything**:
@@ -222,11 +213,6 @@ All servers use HTTP transport mode with the following common settings:
   - `UNIFI_API_KEY` - API key
 
 #### UniFi Manager MCP
-- **ConfigMap**: `unifi-manager-mcp-config`
-  - `LOG_LEVEL` (default: "info")
-- **Secrets**: `unifi-manager-mcp-secrets`
-  - `UNIFI_API_KEY` - API key
-
 #### High Command MCP
 - **ConfigMap**: `high-command-mcp-config`
   - `LOG_LEVEL` (default: "info")
@@ -267,7 +253,6 @@ All services are exposed on port 8000 in the `mcp-servers` namespace:
 - `proxmox-ve-mcp.mcp-servers.svc.cluster.local:8000`
 - `unifi-network-mcp.mcp-servers.svc.cluster.local:8000`
 - `unifi-protect-mcp.mcp-servers.svc.cluster.local:8000`
-- `unifi-manager-mcp.mcp-servers.svc.cluster.local:8000`
 - `high-command-mcp.mcp-servers.svc.cluster.local:8000`
 
 ## Monitoring

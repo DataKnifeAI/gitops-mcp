@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - proxmox-ve-mcp
   - unifi-network-mcp
   - unifi-protect-mcp
-  - unifi-manager-mcp
   - high-command-mcp
 - Kustomize configuration
 - Documentation structure
@@ -30,13 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - proxmox-ve-mcp: `harbor.dataknife.net/library/proxmox-ve-mcp:latest`
   - unifi-network-mcp: `harbor.dataknife.net/library/unifi-network-mcp:latest`
   - unifi-protect-mcp: `harbor.dataknife.net/library/unifi-protect-mcp:latest`
-  - unifi-manager-mcp: `harbor.dataknife.net/library/unifi-manager-mcp:latest`
   - high-command-mcp: `harbor.dataknife.net/library/high-command-mcp:latest`
 - Updated documentation to reflect new Harbor registry image paths
 
 ### Deprecated
 
 ### Removed
+- unifi-manager-mcp - Removed due to container image issues
 
 ### Fixed
 

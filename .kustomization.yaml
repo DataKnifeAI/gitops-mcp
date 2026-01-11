@@ -25,11 +25,6 @@ resources:
   - mcp-servers/unifi-protect-mcp/service.yaml
   - mcp-servers/unifi-protect-mcp/configmap.yaml
   
-  # UniFi Manager MCP
-  - mcp-servers/unifi-manager-mcp/deployment.yaml
-  - mcp-servers/unifi-manager-mcp/service.yaml
-  - mcp-servers/unifi-manager-mcp/configmap.yaml
-  
   # High Command MCP
   - mcp-servers/high-command-mcp/deployment.yaml
   - mcp-servers/high-command-mcp/service.yaml
@@ -40,7 +35,6 @@ resources:
 # - mcp-servers/proxmox-ve-mcp/secret.yaml
 # - mcp-servers/unifi-network-mcp/secret.yaml
 # - mcp-servers/unifi-protect-mcp/secret.yaml
-# - mcp-servers/unifi-manager-mcp/secret.yaml
 
 labels:
   - pairs:

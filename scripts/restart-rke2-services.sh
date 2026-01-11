@@ -71,7 +71,7 @@ echo ""
 echo -e "${BLUE}📋 Getting node list...${NC}"
 
 # Get nodes and determine their roles
-NODES=$(kubectl get nodes --context="$CONTEXT" -o json | jq -r '.items[] | "\(.metadata.name)|\(.metadata.labels."node-role.kubernetes.io/control-plane" // "none")|\(.metadata.labels."node-role.kubernetes.io/worker" // "none")"')
+NODES=$(kubectl get nodes --context="$CONTEXT" -o json | jq -r '.items[] | "\(.metadata.name)|\(if .metadata.labels."node-role.kubernetes.io/control-plane" then "control-plane" else "worker" end)"')
 
 if [ -z "$NODES" ]; then
     echo -e "${RED}❌ Error: No nodes found in cluster${NC}"
@@ -82,9 +82,9 @@ fi
 SUCCESS_COUNT=0
 FAILED_NODES=()
 
-while IFS='|' read -r NODE_NAME CONTROL_PLANE WORKER; do
+while IFS='|' read -r NODE_NAME NODE_ROLE; do
     # Determine service name
-    if [ "$CONTROL_PLANE" != "none" ]; then
+    if [ "$NODE_ROLE" == "control-plane" ]; then
         SERVICE="rke2-server"
         NODE_TYPE="control-plane"
     else
