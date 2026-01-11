@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: high-command-mcp
-  namespace: high-command
+  namespace: mcp-servers
   labels:
     app: high-command-mcp
     version: v1
