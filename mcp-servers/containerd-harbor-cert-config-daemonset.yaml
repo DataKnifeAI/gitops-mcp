@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: containerd-harbor-cert-config
+  namespace: mcp-servers
+  labels:
+    app: containerd-harbor-cert-config
+    component: mcp-infrastructure
+    managed-by: gitops
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: containerd-harbor-cert-config
+  template:
+    metadata:
+      labels:
+        app: containerd-harbor-cert-config
+        component: mcp-infrastructure
+        managed-by: gitops
+    spec:
+      containers:
+      - name: cert-config
+        image: alpine:latest
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+
+          HARBOR_URL="harbor.dataknife.net"
+          MOUNTED_CERT="/cert/ca.crt"
+
+          # RKE2 registry configuration paths
+          RKE2_REGISTRY_DIR="/etc/rancher/rke2"
+          RKE2_REGISTRY_YAML="${RKE2_REGISTRY_DIR}/registries.yaml"
+          RKE2_CERT_FILE="${RKE2_REGISTRY_DIR}/harbor-ca.crt"
+
+          # Also configure containerd certs.d directory (backup method)
+          CONTAINERD_CERTS_DIR="/var/lib/rancher/rke2/agent/etc/containerd/certs.d/${HARBOR_URL}"
+          CONTAINERD_CERT_FILE="${CONTAINERD_CERTS_DIR}/ca.crt"
+
+          echo "Configuring RKE2 to trust Harbor registry certificate..."
+          echo "RKE2 registry config: ${RKE2_REGISTRY_YAML}"
+          echo "RKE2 certificate file: ${RKE2_CERT_FILE}"
+          echo "Mounted certificate: ${MOUNTED_CERT}"
+
+          # Check if mounted certificate exists
+          if [ ! -f "${MOUNTED_CERT}" ]; then
+            echo "Error: Mounted certificate not found at ${MOUNTED_CERT}"
+            exit 1
+          fi
+
+          # Create RKE2 registry directory
+          echo "Creating RKE2 registry directory: ${RKE2_REGISTRY_DIR}"
+          mkdir -p "${RKE2_REGISTRY_DIR}"
+
+          # Copy certificate for RKE2 registries.yaml
+          echo "Copying certificate to ${RKE2_CERT_FILE}"
+          cp "${MOUNTED_CERT}" "${RKE2_CERT_FILE}"
+          chmod 644 "${RKE2_CERT_FILE}"
+
+          # Create RKE2 registries.yaml configuration
+          echo "Creating RKE2 registries.yaml configuration..."
+          cat > "${RKE2_REGISTRY_YAML}" <<EOF
+          mirrors:
+            "${HARBOR_URL}":
+              endpoint:
+                - "https://${HARBOR_URL}"
+          configs:
+            "${HARBOR_URL}":
+              tls:
+                ca_file: "${RKE2_CERT_FILE}"
+          EOF
+
+          chmod 644 "${RKE2_REGISTRY_YAML}"
+          echo "✓ RKE2 registries.yaml created"
+
+          # Also configure containerd certs.d (for compatibility)
+          echo "Also configuring containerd certs.d directory..."
+          mkdir -p "${CONTAINERD_CERTS_DIR}"
+          cp "${MOUNTED_CERT}" "${CONTAINERD_CERT_FILE}"
+          chmod 644 "${CONTAINERD_CERT_FILE}"
+          echo "✓ containerd certs.d configured"
+
+          echo "✓ Certificate configuration complete"
+          echo "RKE2 registries.yaml: ${RKE2_REGISTRY_YAML}"
+          echo "Certificate file: ${RKE2_CERT_FILE}"
+          echo ""
+          echo "Note: RKE2 service may need to be restarted for changes to take effect."
+          echo "The certificate is configured, but you may need to run:"
+          echo "  sudo systemctl restart rke2-agent  # or rke2-server on control-plane nodes"
+          echo ""
+          echo "Keeping container running to maintain configuration..."
+          while true; do
+            # Verify certificate and config files still exist every 60 seconds
+            if [ ! -f "${RKE2_CERT_FILE}" ] || [ ! -f "${RKE2_REGISTRY_YAML}" ]; then
+              echo "Warning: Certificate or config missing, re-applying..."
+              mkdir -p "${RKE2_REGISTRY_DIR}"
+              cp "${MOUNTED_CERT}" "${RKE2_CERT_FILE}"
+              chmod 644 "${RKE2_CERT_FILE}"
+              cat > "${RKE2_REGISTRY_YAML}" <<EOF
+          mirrors:
+            "${HARBOR_URL}":
+              endpoint:
+                - "https://${HARBOR_URL}"
+          configs:
+            "${HARBOR_URL}":
+              tls:
+                ca_file: "${RKE2_CERT_FILE}"
+          EOF
+              chmod 644 "${RKE2_REGISTRY_YAML}"
+            fi
+            sleep 60
+          done
+        resources: {}
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /cert
+          name: harbor-cert
+          readOnly: true
+        - mountPath: /var/lib/rancher/rke2/agent/etc/containerd/certs.d
+          name: rke2-containerd-certs
+        - mountPath: /etc/rancher/rke2
+          name: rke2-registry-config
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      volumes:
+      - name: harbor-cert
+        secret:
+          defaultMode: 420
+          items:
+          - key: ca.crt
+            path: ca.crt
+          secretName: harbor-ca-cert
+      - hostPath:
+          path: /var/lib/rancher/rke2/agent/etc/containerd/certs.d
+          type: DirectoryOrCreate
+        name: rke2-containerd-certs
+      - hostPath:
+          path: /etc/rancher/rke2
+          type: DirectoryOrCreate
+        name: rke2-registry-config
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

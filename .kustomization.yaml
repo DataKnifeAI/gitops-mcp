@@ -7,6 +7,9 @@ resources:
   # Namespace
   - namespace.yaml
   
+  # Harbor Certificate Configuration (DaemonSet)
+  - mcp-servers/containerd-harbor-cert-config-daemonset.yaml
+  
   # Proxmox VE MCP
   - mcp-servers/proxmox-ve-mcp/deployment.yaml
   - mcp-servers/proxmox-ve-mcp/service.yaml
