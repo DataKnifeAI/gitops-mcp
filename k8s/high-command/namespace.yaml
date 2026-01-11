@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: high-command
+  labels:
+    name: high-command
+    app.kubernetes.io/name: high-command

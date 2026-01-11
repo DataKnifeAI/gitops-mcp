@@ -18,9 +18,11 @@ spec:
         app: unifi-manager-mcp
         component: mcp-server
     spec:
+      imagePullSecrets:
+      - name: harbor-registry-secret
       containers:
       - name: unifi-manager-mcp
-        image: ghcr.io/surrealwolf/unifi-manager-mcp:latest
+        image: harbor.dataknife.net/library/unifi-manager-mcp:latest
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration

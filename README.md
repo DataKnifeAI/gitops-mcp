@@ -40,7 +40,6 @@ gitops-mcp/
     └── high-command-mcp/
         ├── deployment.yaml
         ├── service.yaml
-        ├── serviceaccount.yaml
         ├── configmap.yaml
         └── secret.yaml.example
 ```
@@ -61,18 +60,40 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
 
 1. Kubernetes cluster access
 2. `kubectl` configured
-3. Container images available at:
-   - `ghcr.io/surrealwolf/proxmox-ve-mcp:latest`
-   - `ghcr.io/surrealwolf/unifi-network-mcp:latest`
-   - `ghcr.io/surrealwolf/unifi-protect-mcp:latest`
-   - `ghcr.io/surrealwolf/unifi-manager-mcp:latest`
-   - `ghcr.io/surrealwolf/high-command-mcp:latest`
+3. Container images available at Harbor registry:
+   - `harbor.dataknife.net/library/proxmox-ve-mcp:latest`
+   - `harbor.dataknife.net/library/unifi-network-mcp:latest`
+   - `harbor.dataknife.net/library/unifi-protect-mcp:latest`
+   - `harbor.dataknife.net/library/unifi-manager-mcp:latest`
+   - `harbor.dataknife.net/library/high-command-mcp:latest`
+4. Harbor registry credentials with pull access
 
 ## Quick Start
 
 ### Using Kustomize (Recommended)
 
-1. **Create Secrets** (one-time setup):
+1. **Create Harbor Registry Secret** (required for pulling images):
+   ```bash
+   # Create the Harbor registry secret in the mcp-servers namespace
+   kubectl create secret docker-registry harbor-registry-secret \
+     --docker-server=harbor.dataknife.net \
+     --docker-username=<your-harbor-username> \
+     --docker-password=<your-harbor-password> \
+     --docker-email=<your-email@example.com> \
+     --namespace=mcp-servers
+   
+   # Verify the secret was created
+   kubectl get secret harbor-registry-secret -n mcp-servers
+   ```
+   
+   **Alternative**: Use the example template and apply it manually:
+   ```bash
+   # Edit mcp-servers/harbor-registry-secret.yaml.example with your credentials
+   # Then apply it
+   kubectl apply -f mcp-servers/harbor-registry-secret.yaml
+   ```
+
+2. **Create Application Secrets** (one-time setup):
    ```bash
    # Copy example secrets and fill in your values
    cp mcp-servers/proxmox-ve-mcp/secret.yaml.example mcp-servers/proxmox-ve-mcp/secret.yaml
@@ -84,7 +105,7 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
    # DO NOT commit these files to git!
    ```
 
-2. **Update kustomization.yaml** to include secrets:
+3. **Update kustomization.yaml** to include secrets:
    ```yaml
    resources:
      # ... existing resources ...
@@ -94,7 +115,7 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
      - mcp-servers/unifi-manager-mcp/secret.yaml
    ```
 
-3. **Deploy everything**:
+4. **Deploy everything**:
    ```bash
    kubectl apply -k .
    ```
@@ -106,7 +127,17 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
    kubectl apply -f namespace.yaml
    ```
 
-2. **Deploy each MCP server**:
+2. **Create Harbor Registry Secret** (required for pulling images):
+   ```bash
+   kubectl create secret docker-registry harbor-registry-secret \
+     --docker-server=harbor.dataknife.net \
+     --docker-username=<your-harbor-username> \
+     --docker-password=<your-harbor-password> \
+     --docker-email=<your-email@example.com> \
+     --namespace=mcp-servers
+   ```
+
+3. **Deploy each MCP server**:
    ```bash
    # Proxmox VE MCP
    kubectl apply -f mcp-servers/proxmox-ve-mcp/configmap.yaml
@@ -122,6 +153,38 @@ For detailed information about each server, see [docs/MCP_SERVERS_REVIEW.md](doc
 ### Namespace
 
 All resources are deployed to the `mcp-servers` namespace, which is created automatically.
+
+### Harbor Registry Authentication
+
+All deployments are configured to use Harbor registry (`harbor.dataknife.net`) and require authentication to pull images. The `harbor-registry-secret` must be created in the `mcp-servers` namespace before deploying.
+
+**Creating the Harbor Registry Secret**:
+```bash
+kubectl create secret docker-registry harbor-registry-secret \
+  --docker-server=harbor.dataknife.net \
+  --docker-username=<your-harbor-username> \
+  --docker-password=<your-harbor-password> \
+  --docker-email=<your-email@example.com> \
+  --namespace=mcp-servers
+```
+
+**Note**: If using a Harbor robot account (recommended for CI/CD), use the robot account username and token. Robot account format: `robot$library+botname`.
+
+**Using GitHub CLI and Actions**:
+
+1. **Set up secrets using GitHub CLI**:
+   ```bash
+   # Use the interactive setup script
+   ./scripts/setup-harbor-secrets.sh
+   
+   # Or manually set secrets
+   echo "robot\$library+ci-bot" | gh secret set HARBOR_USERNAME
+   echo "your-token" | gh secret set HARBOR_PASSWORD
+   ```
+
+2. **Deploy via GitHub Actions**: Run the workflow `.github/workflows/deploy-harbor-secret.yml` which will automatically pull secrets and create the Kubernetes secret.
+
+All deployments include `imagePullSecrets` referencing this secret.
 
 ### Environment Variables
 
@@ -170,7 +233,6 @@ All servers use HTTP transport mode with the following common settings:
   - `MCP_WORKERS` (default: "4")
   - `X_SUPER_CLIENT` (default: "hc.mcp-servers.cluster")
   - `X_SUPER_CONTACT` (default: "ops@example.com")
-- **ServiceAccount**: `high-command-mcp` (for future RBAC)
 
 ## Health Checks
 
@@ -288,7 +350,6 @@ Each MCP server has its own directory with:
 - `service.yaml` - Service manifest
 - `configmap.yaml` - Non-sensitive configuration
 - `secret.yaml.example` - Secret template (copy to `secret.yaml` and fill in)
-- `serviceaccount.yaml` - ServiceAccount (if needed, e.g., high-command-mcp)
 
 This organization makes it easy to:
 - Manage individual servers independently

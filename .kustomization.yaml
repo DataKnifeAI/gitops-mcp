@@ -30,7 +30,6 @@ resources:
   # High Command MCP
   - mcp-servers/high-command-mcp/deployment.yaml
   - mcp-servers/high-command-mcp/service.yaml
-  - mcp-servers/high-command-mcp/serviceaccount.yaml
   - mcp-servers/high-command-mcp/configmap.yaml
 
 # Note: secrets.yaml files should be added separately and not committed to git

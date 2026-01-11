@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: high-command-mcp
-  namespace: mcp-servers
+  namespace: high-command
   labels:
     app: high-command-mcp
     version: v1
@@ -18,12 +18,13 @@ spec:
         app: high-command-mcp
         component: mcp-server
     spec:
-      serviceAccountName: high-command-mcp
+      imagePullSecrets:
+      - name: harbor-registry-secret
       securityContext:
         fsGroup: 1000
       containers:
       - name: high-command-mcp
-        image: ghcr.io/surrealwolf/high-command-mcp:latest
+        image: harbor.dataknife.net/library/high-command-mcp:latest
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: high-command-mcp-config
-  namespace: mcp-servers
+  namespace: high-command
   labels:
     app: high-command-mcp
     component: mcp-server

@@ -9,7 +9,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
 - **Language**: Go
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
 - **Default Port**: 8000
-- **Image**: `ghcr.io/surrealwolf/proxmox-ve-mcp:latest`
+- **Image**: `harbor.dataknife.net/library/proxmox-ve-mcp:latest`
 - **Configuration**:
   - Requires: `PROXMOX_BASE_URL`, `PROXMOX_API_USER`, `PROXMOX_API_TOKEN_ID`, `PROXMOX_API_TOKEN_SECRET`
   - Optional: `PROXMOX_SKIP_SSL_VERIFY`
@@ -19,7 +19,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
 - **Language**: Go
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
 - **Default Port**: 8000
-- **Image**: `ghcr.io/surrealwolf/unifi-network-mcp:latest`
+- **Image**: `harbor.dataknife.net/library/unifi-network-mcp:latest`
 - **Configuration**:
   - Requires: `UNIFI_API_KEY`
   - Optional: `UNIFI_BASE_URL` (default: `https://192.168.1.1`), `UNIFI_SKIP_SSL_VERIFY`
@@ -29,7 +29,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
 - **Language**: Go
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
 - **Default Port**: 8000
-- **Image**: `ghcr.io/surrealwolf/unifi-protect-mcp:latest`
+- **Image**: `harbor.dataknife.net/library/unifi-protect-mcp:latest`
 - **Configuration**:
   - Requires: `UNIFI_API_KEY`
   - Optional: `UNIFI_BASE_URL` (default: `https://192.168.1.1`), `UNIFI_SKIP_SSL_VERIFY`
@@ -39,7 +39,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
 - **Language**: Go
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
 - **Default Port**: 8000
-- **Image**: `ghcr.io/surrealwolf/unifi-manager-mcp:latest`
+- **Image**: `harbor.dataknife.net/library/unifi-manager-mcp:latest`
 - **Configuration**:
   - Requires: `UNIFI_API_KEY`
 
@@ -48,7 +48,7 @@ This document summarizes the HTTP MCP servers found in `/home/lee/git` and their
 - **Language**: Python
 - **HTTP Support**: ✅ Yes (via `MCP_TRANSPORT=http`)
 - **Default Port**: 8000
-- **Image**: `ghcr.io/surrealwolf/high-command-mcp:latest`
+- **Image**: `harbor.dataknife.net/library/high-command-mcp:latest`
 - **Configuration**:
   - Optional: `MCP_WORKERS`, `X_SUPER_CLIENT`, `X_SUPER_CONTACT`
 - **Note**: Already had a deployment example in `k8s/deployment.yaml` (updated for nrpd-apps)

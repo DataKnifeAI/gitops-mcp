@@ -20,8 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security best practices implementation
 - Health checks and resource limits
 - High availability configuration
+- Harbor registry authentication support with `imagePullSecrets`
+- GitHub Actions workflow for automated Harbor secret deployment (`.github/workflows/deploy-harbor-secret.yml`)
+- GitHub CLI integration for secret management
+- Interactive setup script (`scripts/setup-harbor-secrets.sh`) for setting Harbor secrets using `gh secret`
 
 ### Changed
+- Updated all Docker image paths from `ghcr.io/surrealwolf/*` to `harbor.dataknife.net/library/*` registry
+  - proxmox-ve-mcp: `harbor.dataknife.net/library/proxmox-ve-mcp:latest`
+  - unifi-network-mcp: `harbor.dataknife.net/library/unifi-network-mcp:latest`
+  - unifi-protect-mcp: `harbor.dataknife.net/library/unifi-protect-mcp:latest`
+  - unifi-manager-mcp: `harbor.dataknife.net/library/unifi-manager-mcp:latest`
+  - high-command-mcp: `harbor.dataknife.net/library/high-command-mcp:latest`
+- Updated documentation to reflect new Harbor registry image paths
 
 ### Deprecated
 
