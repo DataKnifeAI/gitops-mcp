@@ -14,21 +14,25 @@ resources:
   - mcp-servers/proxmox-ve-mcp/deployment.yaml
   - mcp-servers/proxmox-ve-mcp/service.yaml
   - mcp-servers/proxmox-ve-mcp/configmap.yaml
+  - mcp-servers/proxmox-ve-mcp/ingress.yaml
   
   # UniFi Network MCP
   - mcp-servers/unifi-network-mcp/deployment.yaml
   - mcp-servers/unifi-network-mcp/service.yaml
   - mcp-servers/unifi-network-mcp/configmap.yaml
+  - mcp-servers/unifi-network-mcp/ingress.yaml
   
   # UniFi Protect MCP
   - mcp-servers/unifi-protect-mcp/deployment.yaml
   - mcp-servers/unifi-protect-mcp/service.yaml
   - mcp-servers/unifi-protect-mcp/configmap.yaml
+  - mcp-servers/unifi-protect-mcp/ingress.yaml
   
   # High Command MCP
   - mcp-servers/high-command-mcp/deployment.yaml
   - mcp-servers/high-command-mcp/service.yaml
   - mcp-servers/high-command-mcp/configmap.yaml
+  - mcp-servers/high-command-mcp/ingress.yaml
 
 # Note: secrets.yaml files should be added separately and not committed to git
 # Uncomment and add secret files when using kustomize:

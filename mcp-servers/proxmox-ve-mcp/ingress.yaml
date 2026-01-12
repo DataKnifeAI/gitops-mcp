@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxmox-ve-mcp
+  namespace: mcp-servers
+  labels:
+    app: proxmox-ve-mcp
+    component: mcp-server
+    managed-by: gitops
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: proxmox-ve-mcp.dataknife.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: proxmox-ve-mcp
+            port:
+              number: 8000

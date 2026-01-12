@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: unifi-protect-mcp
+  namespace: mcp-servers
+  labels:
+    app: unifi-protect-mcp
+    component: mcp-server
+    managed-by: gitops
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: unifi-protect-mcp.dataknife.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: unifi-protect-mcp
+            port:
+              number: 8000
