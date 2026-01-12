@@ -22,7 +22,7 @@ spec:
       - name: harbor-registry-secret
       containers:
       - name: unifi-protect-mcp
-        image: harbor.dataknife.net/library/unifi-protect-mcp:latest
+        image: harbor.dataknife.net/library/unifi-protect-mcp:v0.9
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration
