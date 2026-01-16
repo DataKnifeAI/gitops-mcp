@@ -22,7 +22,7 @@ spec:
       - name: harbor-registry-secret
       containers:
       - name: unifi-network-mcp
-        image: https://harbor.dataknife.net/library/unifi-network-mcp:v0.10
+        image: harbor.dataknife.net/library/unifi-network-mcp:v0.10
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration

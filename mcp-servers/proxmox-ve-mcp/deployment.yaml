@@ -22,7 +22,7 @@ spec:
       - name: harbor-registry-secret
       containers:
       - name: proxmox-ve-mcp
-        image: https://harbor.dataknife.net/library/proxmox-ve-mcp:v0.41
+        image: harbor.dataknife.net/library/proxmox-ve-mcp:v0.41
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration
