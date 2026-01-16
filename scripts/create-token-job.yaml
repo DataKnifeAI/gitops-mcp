@@ -1,0 +1,73 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: grafana-token-creator
+  namespace: mcp-servers
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: token-creator
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          GRAFANA_URL="http://grafana.managed-syslog.svc.cluster.local"
+          # GRAFANA_PASSWORD should be provided via environment variable or secret
+          # Get from secret if not provided as env var
+          if [ -z "$GRAFANA_PASSWORD" ]; then
+            GRAFANA_PASSWORD=$(kubectl get secret grafana -n managed-syslog -o jsonpath='{.data.admin-password}' 2>/dev/null | base64 -d || echo "")
+          fi
+          
+          if [ -z "$GRAFANA_PASSWORD" ]; then
+            echo "Error: GRAFANA_PASSWORD not set and could not retrieve from secret"
+            exit 1
+          fi
+          
+          echo "Creating service account..."
+          SA_RESPONSE=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -u "admin:$GRAFANA_PASSWORD" \
+            "$GRAFANA_URL/api/serviceaccounts" \
+            -d '{"name":"mcp-server","role":"Editor","isDisabled":false}')
+          
+          SA_ID=$(echo "$SA_RESPONSE" | grep -oE '"id":[0-9]+' | head -1 | cut -d: -f2)
+          
+          if [ -z "$SA_ID" ]; then
+            # Check if it already exists
+            SA_SEARCH=$(curl -s -u "admin:$GRAFANA_PASSWORD" "$GRAFANA_URL/api/serviceaccounts/search?query=mcp-server")
+            SA_ID=$(echo "$SA_SEARCH" | grep -oE '"id":[0-9]+' | head -1 | cut -d: -f2)
+          fi
+          
+          echo "Service Account ID: $SA_ID"
+          
+          echo "Creating token..."
+          TOKEN_RESPONSE=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -u "admin:$GRAFANA_PASSWORD" \
+            "$GRAFANA_URL/api/serviceaccounts/$SA_ID/tokens" \
+            -d '{"name":"mcp-server-token","secondsToLive":0}')
+          
+          TOKEN=$(echo "$TOKEN_RESPONSE" | grep -oE '"key":"[^"]*' | cut -d'"' -f4)
+          
+          if [ -z "$TOKEN" ]; then
+            echo "Error: Could not extract token from response:"
+            echo "$TOKEN_RESPONSE"
+            exit 1
+          fi
+          
+          echo "Token created: ${TOKEN:0:20}..."
+          
+          echo "Updating secret..."
+          TOKEN_B64=$(echo -n "$TOKEN" | base64 -w 0)
+          kubectl patch secret grafana-mcp-secrets -n mcp-servers --type='json' \
+            -p="[{\"op\":\"replace\",\"path\":\"/data/GRAFANA_SERVICE_ACCOUNT_TOKEN\",\"value\":\"$TOKEN_B64\"}]"
+          
+          echo "Secret updated successfully!"
+          echo "Restarting pods to pick up new token..."
+          kubectl rollout restart deployment grafana-mcp -n mcp-servers
+      restartPolicy: Never

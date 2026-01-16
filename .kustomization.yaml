@@ -33,12 +33,19 @@ resources:
   - mcp-servers/high-command-mcp/service.yaml
   - mcp-servers/high-command-mcp/configmap.yaml
   - mcp-servers/high-command-mcp/ingress.yaml
+  
+  # Grafana MCP
+  - mcp-servers/grafana-mcp/deployment.yaml
+  - mcp-servers/grafana-mcp/service.yaml
+  - mcp-servers/grafana-mcp/configmap.yaml
+  - mcp-servers/grafana-mcp/ingress.yaml
 
 # Note: secrets.yaml files should be added separately and not committed to git
 # Uncomment and add secret files when using kustomize:
 # - mcp-servers/proxmox-ve-mcp/secret.yaml
 # - mcp-servers/unifi-network-mcp/secret.yaml
 # - mcp-servers/unifi-protect-mcp/secret.yaml
+# - mcp-servers/grafana-mcp/secret.yaml
 
 labels:
   - pairs:

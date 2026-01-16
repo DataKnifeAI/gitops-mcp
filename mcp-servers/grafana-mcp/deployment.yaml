@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-mcp
+  namespace: mcp-servers
+  labels:
+    app: grafana-mcp
+    version: v1
+    component: mcp-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grafana-mcp
+  template:
+    metadata:
+      labels:
+        app: grafana-mcp
+        component: mcp-server
+    spec:
+      imagePullSecrets:
+      - name: harbor-registry-secret
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: grafana-mcp
+        image: grafana/mcp-grafana:latest
+        imagePullPolicy: IfNotPresent
+        
+        # HTTP Transport Configuration - streamable-http mode
+        args:
+        - "-t"
+        - "streamable-http"
+        - "--address"
+        - "0.0.0.0:8000"
+        
+        env:
+        - name: GRAFANA_URL
+          valueFrom:
+            configMapKeyRef:
+              name: grafana-mcp-config
+              key: GRAFANA_URL
+        - name: GRAFANA_SERVICE_ACCOUNT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: grafana-mcp-secrets
+              key: GRAFANA_SERVICE_ACCOUNT_TOKEN
+              optional: true
+        - name: GRAFANA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: grafana-mcp-secrets
+              key: GRAFANA_USERNAME
+              optional: true
+        - name: GRAFANA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-mcp-secrets
+              key: GRAFANA_PASSWORD
+              optional: true
+        - name: GRAFANA_ORG_ID
+          valueFrom:
+            secretKeyRef:
+              name: grafana-mcp-secrets
+              key: GRAFANA_ORG_ID
+              optional: true
+        
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        
+        # Health Checks - Grafana MCP uses /healthz endpoint
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 2
+        
+        # Resource Management
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        
+        # Security Context
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      
+      # Volumes
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      
+      # Pod Disruption Budget
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - grafana-mcp
+              topologyKey: kubernetes.io/hostname
