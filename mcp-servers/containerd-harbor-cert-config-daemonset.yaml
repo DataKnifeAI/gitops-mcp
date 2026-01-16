@@ -19,9 +19,11 @@ spec:
         component: mcp-infrastructure
         managed-by: gitops
     spec:
+      imagePullSecrets:
+      - name: harbor-registry-secret
       containers:
       - name: cert-config
-        image: dockerhub/library/alpine:latest
+        image: harbor.dataknife.net/dockerhub/library/alpine:latest
         imagePullPolicy: Always
         command:
         - /bin/sh
