@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-mcp-config
+  namespace: mcp-servers
+  labels:
+    app: grafana-mcp
+    component: mcp-server
+data:
+  # Using ingress URL for cross-cluster access (MCP on prd-apps, Grafana on nprd-apps)
+  GRAFANA_URL: "https://grafana.dataknife.net"

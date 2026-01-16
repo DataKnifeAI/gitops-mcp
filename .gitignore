@@ -2,6 +2,8 @@
 secrets.yaml
 *.secret.yaml
 *.secrets.yaml
+**/secret.yaml
+!**/secret.yaml.example
 
 # Kubernetes temporary files
 *.tmp.yaml
