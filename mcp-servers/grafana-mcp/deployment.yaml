@@ -18,8 +18,6 @@ spec:
         app: grafana-mcp
         component: mcp-server
     spec:
-      imagePullSecrets:
-      - name: harbor-registry-secret
       securityContext:
         fsGroup: 1000
       containers:
