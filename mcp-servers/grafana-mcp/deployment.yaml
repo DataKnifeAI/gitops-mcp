@@ -24,7 +24,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: grafana-mcp
-        image: grafana/mcp-grafana:latest
+        image: dockerhub/library/grafana/mcp-grafana:latest
         imagePullPolicy: IfNotPresent
         
         # HTTP Transport Configuration - streamable-http mode
