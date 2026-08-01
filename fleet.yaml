@@ -11,6 +11,10 @@
 # - Fleet can apply Kubernetes manifests directly without Kustomize
 # - Individual resource files are self-contained and valid
 #
+# Harbor (harbor.dataknife.net) uses Let's Encrypt — no custom CA DaemonSet.
+# GitRepo keepResources: true may leave orphaned containerd-harbor-cert-config /
+# harbor-ca-cert on prd-apps after this repo drops them; delete manually if needed.
+#
 # For local kustomize usage:
 #   mv .kustomization.yaml kustomization.yaml
 #   kubectl kustomize .
