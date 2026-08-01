@@ -1,5 +1,8 @@
 # GitOps MCP - Kubernetes Deployments
 
+![GitOps MCP server](docs/assets/gitops-mcp-hero.jpg)
+
+
 > **Note**: This project was built with [Cursor](https://cursor.sh) and the Composer model, demonstrating AI-assisted development for Kubernetes infrastructure as code.
 
 This repository contains Kubernetes deployment manifests for HTTP MCP servers in a dedicated `mcp-servers` namespace.
