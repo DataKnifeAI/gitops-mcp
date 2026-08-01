@@ -149,6 +149,13 @@ All resources are deployed to the `mcp-servers` namespace, which is created auto
 
 All deployments are configured to use Harbor registry (`harbor.dataknife.net`) and require authentication to pull images. The `harbor-registry-secret` must be created in the `mcp-servers` namespace before deploying.
 
+Harbor serves a Let's Encrypt certificate, so nodes trust it via the public CA chain — there is no custom Harbor CA DaemonSet (`containerd-harbor-cert-config`) or `harbor-ca-cert` secret in this repo. If Fleet `keepResources: true` leaves those objects on **prd-apps** after sync, delete them manually in `mcp-servers`:
+
+```bash
+kubectl delete daemonset containerd-harbor-cert-config -n mcp-servers --context=prd-apps --ignore-not-found
+kubectl delete secret harbor-ca-cert -n mcp-servers --context=prd-apps --ignore-not-found
+```
+
 **Creating the Harbor Registry Secret**:
 ```bash
 kubectl create secret docker-registry harbor-registry-secret \
