@@ -68,12 +68,11 @@ spec:
           containerPort: 8000
           protocol: TCP
         
-        # Health Checks - Grafana MCP uses /healthz endpoint
+        # tcpSocket avoids Host-allowlist 403 on kubelet httpGet (/healthz).
+        # Works for both pre- and post-DNS-rebinding mcp-grafana images.
         livenessProbe:
-          httpGet:
-            path: /healthz
+          tcpSocket:
             port: http
-            scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 5
@@ -81,10 +80,8 @@ spec:
           failureThreshold: 3
         
         readinessProbe:
-          httpGet:
-            path: /healthz
+          tcpSocket:
             port: http
-            scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 3
