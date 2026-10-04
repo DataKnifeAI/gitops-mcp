@@ -343,6 +343,32 @@ from the manifest is removed from the live object.
   replication slot cannot fill the volume.
 - Rebuild a single broken replica with `kubectl cnpg destroy high-command-postgres <n> -n high-command`.
   CNPG re-clones it with `pg_basebackup` and drops the old slot.
+- Helm patches custom resources with a two-way merge (previous manifest to new manifest), so a
+  field changed live and not in git is never corrected unless the manifest changes it.
+
+### Backups
+
+WAL is archived continuously and a base backup runs daily at 09:30 UTC through the Barman Cloud
+plugin, installed by [gitops-core `cnpg-barman-cloud`](https://github.com/DataKnifeAI/gitops-core/tree/main/cnpg-barman-cloud).
+The config is in `k8s/high-command/objectstore.yaml` (ObjectStore + ScheduledBackup) and the
+`plugins` section of the Cluster.
+
+- **Where**: `s3://rke2-backups/cnpg/prd-apps/high-command-postgres/` on rustfs
+  (`https://rustfs.dataknife.net:30292`), gzip, 14 day retention.
+- **Credentials**: `cnpg-backup-rustfs` secret in `high-command` (keys `ACCESS_KEY_ID`,
+  `ACCESS_SECRET_KEY`), created by hand, not in git.
+
+```bash
+kubectl cnpg status high-command-postgres -n high-command
+kubectl -n high-command get backups.postgresql.cnpg.io
+kubectl cnpg backup high-command-postgres -n high-command --method=plugin --plugin-name=barman-cloud.cloudnative-pg.io
+```
+
+Restore (PITR possible): create a new Cluster with `bootstrap.recovery.source` set to an
+`externalClusters` entry that uses plugin `barman-cloud.cloudnative-pg.io` with
+`barmanObjectName: high-command-postgres-rustfs` and `serverName: high-command-postgres`. Then
+point the Pooler (`spec.cluster.name`) or the apps at the new cluster. A full example is in the
+gitops-core `cnpg-barman-cloud` README.
 
 ## Documentation
 
