@@ -1,0 +1,18 @@
+# PgBouncer pooler (rw) in front of high-command-postgres. Adopted from a hand-applied Pooler.
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: high-command-postgres-pooler
+  namespace: high-command
+spec:
+  cluster:
+    name: high-command-postgres
+  instances: 2
+  type: rw
+  pgbouncer:
+    poolMode: transaction
+    paused: false
+    parameters:
+      default_pool_size: "25"
+      max_client_conn: "1000"
+      reserve_pool_size: "5"

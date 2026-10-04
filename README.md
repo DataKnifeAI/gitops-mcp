@@ -329,6 +329,21 @@ mv kustomization.yaml .kustomization.yaml
 - Vault
 - Your GitOps tool's secret management
 
+## High Command database (CloudNativePG)
+
+`k8s/high-command/` holds the `high-command-postgres` CloudNativePG Cluster (3 instances, 10Gi,
+database `highcommand`) and its `high-command-postgres-pooler` PgBouncer Pooler in the
+`high-command` namespace. Both were originally applied by hand and are adopted by Fleet via
+`helm.takeOwnership` in `fleet.yaml`. The Cluster spec deliberately mirrors the live object,
+including operator-defaulted fields. Keep it that way: under Helm adoption, any field dropped
+from the manifest is removed from the live object.
+
+- `high-command-postgres-credentials` (username, password) is created by hand, not in git.
+- `max_slot_wal_keep_size: 2GB` caps WAL retained for a lagging or broken replica, so a dead
+  replication slot cannot fill the volume.
+- Rebuild a single broken replica with `kubectl cnpg destroy high-command-postgres <n> -n high-command`.
+  CNPG re-clones it with `pg_basebackup` and drops the old slot.
+
 ## Documentation
 
 - **[MCP Servers Review](docs/MCP_SERVERS_REVIEW.md)** - Detailed review of all HTTP MCP servers
