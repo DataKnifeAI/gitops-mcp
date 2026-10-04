@@ -1,0 +1,115 @@
+# CloudNativePG Cluster for High Command (database: highcommand)
+# Requires: high-command-postgres-credentials secret (username, password) in this namespace.
+#
+# Adopted from a hand-applied Cluster (helm.takeOwnership in fleet.yaml). The spec mirrors the
+# live object including operator-defaulted fields, so adoption does not drop or change anything.
+# storage.storageClass is intentionally unset (PVCs use the cluster default, truenas-csi-nfs).
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: high-command-postgres
+  namespace: high-command
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.1-system-trixie
+  affinity:
+    podAntiAffinityType: preferred
+  bootstrap:
+    initdb:
+      database: highcommand
+      encoding: UTF8
+      localeCType: C
+      localeCollate: C
+      owner: highcommand
+      secret:
+        name: high-command-postgres-credentials
+  enablePDB: true
+  enableSuperuserAccess: false
+  failoverDelay: 0
+  logLevel: info
+  maxSyncReplicas: 0
+  minSyncReplicas: 0
+  monitoring:
+    customQueriesConfigMap:
+      - key: queries
+        name: cnpg-default-monitoring
+    disableDefaultQueries: false
+    enablePodMonitor: false
+  podSecurityContext:
+    runAsGroup: 26
+    runAsNonRoot: true
+    runAsUser: 26
+  postgresGID: 26
+  postgresUID: 26
+  postgresql:
+    parameters:
+      archive_mode: "on"
+      archive_timeout: 5min
+      checkpoint_completion_target: "0.9"
+      default_statistics_target: "100"
+      dynamic_shared_memory_type: posix
+      effective_cache_size: 1GB
+      effective_io_concurrency: "200"
+      full_page_writes: "on"
+      log_destination: csvlog
+      log_directory: /controller/log
+      log_filename: postgres
+      log_rotation_age: "0"
+      log_rotation_size: "0"
+      log_truncate_on_rotation: "false"
+      logging_collector: "on"
+      maintenance_work_mem: 64MB
+      max_connections: "200"
+      max_parallel_maintenance_workers: "2"
+      max_parallel_workers: "4"
+      max_parallel_workers_per_gather: "2"
+      max_replication_slots: "32"
+      # Cap WAL kept for lagging/broken replicas so a dead slot cannot fill the 10Gi volume.
+      max_slot_wal_keep_size: 2GB
+      max_wal_size: 4GB
+      max_worker_processes: "4"
+      min_wal_size: 1GB
+      random_page_cost: "1.1"
+      shared_buffers: 256MB
+      shared_memory_type: mmap
+      shared_preload_libraries: ""
+      ssl_max_protocol_version: TLSv1.3
+      ssl_min_protocol_version: TLSv1.3
+      wal_buffers: 16MB
+      wal_keep_size: 512MB
+      wal_level: logical
+      wal_log_hints: "on"
+      wal_receiver_timeout: 5s
+      wal_sender_timeout: 5s
+      work_mem: 4MB
+    syncReplicaElectionConstraint:
+      enabled: false
+  primaryUpdateMethod: restart
+  primaryUpdateStrategy: unsupervised
+  probes:
+    liveness:
+      isolationCheck:
+        connectionTimeout: 1000
+        enabled: true
+        requestTimeout: 1000
+  replicationSlots:
+    highAvailability:
+      enabled: true
+      slotPrefix: _cnpg_
+    synchronizeReplicas:
+      enabled: true
+    updateInterval: 30
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  smartShutdownTimeout: 180
+  startDelay: 3600
+  stopDelay: 1800
+  storage:
+    resizeInUseVolumes: true
+    size: 10Gi
+  switchoverDelay: 3600

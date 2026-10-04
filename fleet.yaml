@@ -19,3 +19,8 @@
 #   mv .kustomization.yaml kustomization.yaml
 #   kubectl kustomize .
 #   mv kustomization.yaml .kustomization.yaml
+
+# Adopt objects that existed before they were added here (high-command-postgres Cluster + Pooler
+# were applied by hand). Without this Helm refuses to manage them.
+helm:
+  takeOwnership: true
