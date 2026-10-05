@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - unifi-manager-mcp - Removed due to container image issues
+- grafana-mcp - Removed (no longer needed), including `scripts/create-grafana-mcp-token.sh`
 
 ### Fixed
 
