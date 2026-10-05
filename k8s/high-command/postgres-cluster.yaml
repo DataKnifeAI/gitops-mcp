@@ -87,6 +87,7 @@ spec:
   # WAL archiving + base backups to rustfs (ObjectStore in objectstore.yaml)
   plugins:
     - name: barman-cloud.cloudnative-pg.io
+      enabled: true
       isWALArchiver: true
       parameters:
         barmanObjectName: high-command-postgres-rustfs
