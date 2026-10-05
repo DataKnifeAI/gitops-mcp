@@ -91,7 +91,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: high-command-postgres-rustfs
-  primaryUpdateMethod: restart
+  primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   probes:
     liveness:
