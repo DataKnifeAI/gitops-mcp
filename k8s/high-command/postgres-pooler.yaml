@@ -16,3 +16,8 @@ spec:
       default_pool_size: "25"
       max_client_conn: "1000"
       reserve_pool_size: "5"
+  template:
+    spec:
+      containers:
+        - name: pgbouncer
+          image: ghcr.io/cloudnative-pg/pgbouncer:1.26.0
