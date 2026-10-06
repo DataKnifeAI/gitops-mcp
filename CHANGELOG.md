@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - high-command-mcp: `harbor.dataknife.net/library/high-command-mcp:latest`
 - Updated documentation to reflect new Harbor registry image paths
 - high-command-postgres: PostgreSQL `18.1-system-trixie` → `18.6-system-trixie`; Pooler pinned to `pgbouncer:1.26.0` (was the operator default `1.25.2`)
+- proxmox-ve-mcp `v0.41` → `v0.43`, unifi-network-mcp `v0.10` → `v0.12` (rebuilt images; source change is the Apache-2.0 relicense only)
 
 ### Deprecated
 
