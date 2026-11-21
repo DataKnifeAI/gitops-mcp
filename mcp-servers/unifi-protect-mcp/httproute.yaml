@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: unifi-protect-mcp
+  namespace: mcp-servers
+  labels:
+    app: unifi-protect-mcp
+    component: mcp-server
+    managed-by: gitops
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: kube-system
+      sectionName: websecure
+  hostnames:
+    - unifi-protect-mcp.dataknife.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: unifi-protect-mcp
+          port: 8000

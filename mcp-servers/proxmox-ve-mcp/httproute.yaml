@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: proxmox-ve-mcp
+  namespace: mcp-servers
+  labels:
+    app: proxmox-ve-mcp
+    component: mcp-server
+    managed-by: gitops
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: kube-system
+      sectionName: websecure
+  hostnames:
+    - proxmox-ve-mcp.dataknife.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: proxmox-ve-mcp
+          port: 8000
