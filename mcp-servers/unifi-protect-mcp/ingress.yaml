@@ -10,7 +10,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  ingressClassName: nginx
+  ingressClassName: rke2-ingress-nginx-migration
   rules:
   - host: unifi-protect-mcp.dataknife.net
     http:
