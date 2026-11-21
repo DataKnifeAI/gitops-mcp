@@ -1,0 +1,22 @@
+---
+description: gitops-mcp project-specific agent guidance
+alwaysApply: true
+---
+
+# GitOps MCP
+
+Kustomize GitOps manifests for HTTP MCP servers in namespace `mcp-servers`.
+
+Cursor uses `.cursor/rules/` (this file + org common). Legacy `.cursorrules` remains for other editors.
+
+## Key paths
+
+- `mcp-servers/<name>/` — deployment, service, configmap, `secret.yaml.example`
+- Root `kustomization.yaml` — wire new servers here
+
+## Conventions
+
+- Labels: `app`, `component: mcp-server`, `managed-by: gitops`
+- Naming: `{server}-mcp`; HTTP transport port 8000; probes on `/health`
+- Never commit live `secret.yaml`; non-root UID 1000; drop capabilities
+- Validate with `kubectl apply --dry-run=client` before merge
